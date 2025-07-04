@@ -1,0 +1,6 @@
+services:
+  - type: worker
+    name: sync-worker
+    env: python
+    buildCommand: ""
+    startCommand: python main.py

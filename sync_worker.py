@@ -18,19 +18,21 @@ if not RAW_JSON:
 
 Base.metadata.create_all(bind=engine)
 
-scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/spreadsheets"]
+scope = [
+    'https://www.googleapis.com/auth/spreadsheets',
+    'https://www.googleapis.com/auth/drive'
+]
 creds_dict = json.loads(RAW_JSON)
 creds = Credentials.from_service_account_info(
     creds_dict,
     scopes=scope
 )
 client = gspread.authorize(creds)
-sheet = client.open_by_key(SPREADSHEET_ID).worksheet(WORKSHEET_NAME)
 
 def sync_sheet_to_db():
     print("🔄 Sync: Google Sheets ➡️ PostgreSQL")
     db = SessionLocal()
-    sheet = client.open("logan").sheet1
+    sheet = client.open_by_key(SPREADSHEET_ID).worksheet(WORKSHEET_NAME)
     rows = sheet.get_all_records()
 
     for row in rows:

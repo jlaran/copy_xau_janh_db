@@ -1,3 +1,4 @@
 .env
 reset_db.py
 test_read_data.py
+/__pycache__

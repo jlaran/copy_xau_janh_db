@@ -14,7 +14,7 @@ class AccountStatus(Base):
     __tablename__ = "account_status"
 
     account_number = Column(String, primary_key=True)
-    account_balance = Column(Float)
+    account_balance = Column(String)
     last_trade = Column(String)
     account_mode = Column(String)
     broker_server = Column(String)

@@ -29,21 +29,33 @@ sheet = client.open_by_key(SPREADSHEET_ID).worksheet(WORKSHEET_NAME)
 
 def sync_sheet_to_db():
     print("🔄 Sync: Google Sheets ➡️ PostgreSQL")
-    records = sheet.get_all_records()
     db = SessionLocal()
-    try:
-        db.query(License).delete()
-        for row in records:
-            license = License(
-                account_number=str(row["account_number"]),
-                license_key=row["license_key"],
-                enabled=str(row["enabled"]).lower() == "true"
+    sheet = client.open("logan").sheet1
+    rows = sheet.get_all_records()
+
+    for row in rows:
+        # Validar que la fila tenga un account_number no vacío
+        account_number = str(row.get("account_number", "")).strip()
+        if not account_number:
+            continue  # Saltar filas vacías o sin cuenta
+
+        # Crear o actualizar registro
+        license = db.query(License).filter_by(account_number=account_number).first()
+        if license:
+            license.license_key = row.get("license_key", "").strip()
+            license.enabled = str(row.get("enabled", "False")).lower() == "true"
+        else:
+            new_license = License(
+                account_number=account_number,
+                license_key=row.get("license_key", "").strip(),
+                enabled=str(row.get("enabled", "False")).lower() == "true"
             )
-            db.add(license)
-        db.commit()
-        print("✅ Licencias sincronizadas")
-    finally:
-        db.close()
+            db.add(new_license)
+
+    db.commit()
+    db.close()
+    print("✅ Sincronización completa.")
+
 
 def sync_db_to_sheet():
     print("🔄 Sync: PostgreSQL ➡️ Google Sheets")

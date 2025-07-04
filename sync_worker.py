@@ -8,6 +8,7 @@ from models import License, AccountStatus, Base
 from sqlalchemy import create_engine
 from db import engine
 from google.oauth2.service_account import Credentials
+from datetime import datetime
 
 RAW_JSON = os.getenv("GOOGLE_CREDENTIALS")
 SPREADSHEET_ID = os.getenv("SPREADSHEET_ID")  # ID del Google Sheet desde la URL
@@ -110,8 +111,11 @@ def run_sync():
 
         except Exception as e:
             print(f"❌ Error durante la sincronización: {e}")
+            log("❌ Error durante la sincronización:")
 
         print("⏳ Esperando 60 segundos para el próximo ciclo...\n")
+        log("⏳ Esperando 60 segundos para el próximo ciclo...\n")
         time.sleep(60)
 
-
+def log(msg):
+    print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")

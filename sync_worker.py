@@ -64,23 +64,56 @@ def sync_db_to_sheet():
     print("🔄 Sync: PostgreSQL ➡️ Google Sheets")
     db = SessionLocal()
     try:
-        data = db.query(AccountStatus).all()
-        header = ["account_number", "account_balance", "last_trade", "account_mode", "broker_server", "broker_company", "risk_per_group", "ea_status"]
-        values = [header]
-        for item in data:
-            values.append([
-                item.account_number,
-                item.account_balance,
-                item.last_trade,
-                item.account_mode,
-                item.broker_server,
-                item.broker_company,
-                item.risk_per_group,
-                item.ea_status
-            ])
-        sheet.clear()
-        sheet.update(values)
-        print("✅ Estado de cuentas actualizado en Google Sheets")
+        # Datos de la base de datos
+        db_data = db.query(AccountStatus).all()
+
+        # Leer hoja actual
+        sheet_data = sheet.get_all_values()
+
+        # Validar encabezado
+        if not sheet_data:
+            print("❌ La hoja está vacía. Asegúrate de tener encabezados.")
+            return
+
+        header = sheet_data[0]
+        col_index = {col: i for i, col in enumerate(header)}
+
+        # Columnas que deben ser actualizadas (excluye account_number)
+        updatable_columns = [
+            "account_balance",
+            "last_trade",
+            "account_mode",
+            "broker_server",
+            "broker_company",
+            "risk_per_group",
+            "ea_status"
+        ]
+
+        # Crear índice por account_number
+        sheet_rows_by_account = {
+            row[col_index["account_number"]]: (i, row)
+            for i, row in enumerate(sheet_data[1:], start=2)  # 1-indexed, header es fila 1
+        }
+
+        for item in db_data:
+            account_id = str(item.account_number)
+            if account_id in sheet_rows_by_account:
+                row_number, current_row = sheet_rows_by_account[account_id]
+
+                for column in updatable_columns:
+                    new_value = str(getattr(item, column))
+                    col_pos = col_index[column]
+
+                    # Asegura que la fila tenga suficientes columnas
+                    current_cell_value = current_row[col_pos] if col_pos < len(current_row) else ""
+
+                    if current_cell_value != new_value:
+                        cell_range = f"{chr(65 + col_pos)}{row_number}"
+                        sheet.update(cell_range, [[new_value]])
+                        print(f"✏️ Actualizado {column} para cuenta {account_id} en celda {cell_range}")
+            else:
+                print(f"➕ Cuenta nueva en DB (no está en hoja): {account_id}")
+                # Puedes optar por agregarla con append_row si querés
     finally:
         db.close()
 
@@ -88,5 +121,5 @@ def run_sync():
     while True:
         sync_sheet_to_db()
         time.sleep(3)
-        sync_db_to_sheet()
-        time.sleep(60)  # Espera 1 minuto para el próximo ciclo
+        # sync_db_to_sheet()
+        # time.sleep(60)  # Espera 1 minuto para el próximo ciclo

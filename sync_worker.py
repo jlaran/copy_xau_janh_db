@@ -18,11 +18,11 @@ if not RAW_JSON:
 
 Base.metadata.create_all(bind=engine)
 
-scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive", "https://www.googleapis.com/auth/spreadsheets"]
 creds_dict = json.loads(RAW_JSON)
 creds = Credentials.from_service_account_info(
     creds_dict,
-    scopes=["https://www.googleapis.com/auth/spreadsheets"]
+    scopes=scope
 )
 client = gspread.authorize(creds)
 sheet = client.open_by_key(SPREADSHEET_ID).worksheet(WORKSHEET_NAME)

@@ -28,11 +28,12 @@ creds = Credentials.from_service_account_info(
     scopes=scope
 )
 client = gspread.authorize(creds)
+sheet = client.open_by_key(SPREADSHEET_ID).worksheet(WORKSHEET_NAME)
+
 
 def sync_sheet_to_db():
     print("🔄 Sync: Google Sheets ➡️ PostgreSQL")
     db = SessionLocal()
-    sheet = client.open_by_key(SPREADSHEET_ID).worksheet(WORKSHEET_NAME)
     rows = sheet.get_all_records()
 
     for row in rows:

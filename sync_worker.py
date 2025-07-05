@@ -40,17 +40,39 @@ def sync_sheet_to_db(sheet_data):
         if not account_number:
             continue
 
-        license = db.query(License).filter_by(account_number=account_number).first()
-        if license:
-            license.license_key = str(row.get("license_key", "").strip())
-            license.enabled = str(row.get("enabled", "False")).lower() == "true"
+        # LICENCIA
+        license_obj = db.query(License).filter_by(account_number=account_number).first()
+        if license_obj:
+            license_obj.license_key = str(row.get("license_key", "")).strip()
+            license_obj.enabled = str(row.get("enabled", "")).strip().lower()
         else:
-            new_license = License(
+            db.add(License(
                 account_number=account_number,
-                license_key=str(row.get("license_key", "").strip()),
-                enabled=str(row.get("enabled", "False")).lower() == "true"
-            )
-            db.add(new_license)
+                license_key=row.get("license_key", "").strip(),
+                enabled=str(row.get("enabled", "")).strip().lower()
+            ))
+
+        # ACCOUNT STATUS
+        status_obj = db.query(AccountStatus).filter_by(account_number=account_number).first()
+        if status_obj:
+            status_obj.account_balance = str(row.get("account_balance", "")).strip()
+            status_obj.last_trade = str(row.get("last_trade", "")).strip()
+            status_obj.account_mode = str(row.get("account_mode", "")).strip()
+            status_obj.broker_server = str(row.get("broker_server", "")).strip()
+            status_obj.broker_company = str(row.get("broker_company", "")).strip()
+            status_obj.risk_per_group = str(row.get("risk_per_group", "")).strip()
+            status_obj.ea_status = str(row.get("ea_status", "")).strip()
+        else:
+            db.add(AccountStatus(
+                account_number=account_number,
+                account_balance=str(row.get("account_balance", "")).strip(),
+                last_trade=str(row.get("last_trade", "")).strip(),
+                account_mode=str(row.get("account_mode", "")).strip(),
+                broker_server=str(row.get("broker_server", "")).strip(),
+                broker_company=str(row.get("broker_company", "")).strip(),
+                risk_per_group=str(row.get("risk_per_group", "")).strip(),
+                ea_status=str(row.get("ea_status", "")).strip()
+            ))
 
     db.commit()
     db.close()

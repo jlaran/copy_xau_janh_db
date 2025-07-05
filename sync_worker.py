@@ -54,15 +54,7 @@ def sync_sheet_to_db(sheet_data):
 
         # ACCOUNT STATUS
         status_obj = db.query(AccountStatus).filter_by(account_number=account_number).first()
-        if status_obj:
-            status_obj.account_balance = str(row.get("account_balance", "")).strip()
-            status_obj.last_trade = str(row.get("last_trade", "")).strip()
-            status_obj.account_mode = str(row.get("account_mode", "")).strip()
-            status_obj.broker_server = str(row.get("broker_server", "")).strip()
-            status_obj.broker_company = str(row.get("broker_company", "")).strip()
-            status_obj.risk_per_group = str(row.get("risk_per_group", "")).strip()
-            status_obj.ea_status = str(row.get("ea_status", "")).strip()
-        else:
+        if not status_obj:
             db.add(AccountStatus(
                 account_number=account_number,
                 account_balance=str(row.get("account_balance", "")).strip(),

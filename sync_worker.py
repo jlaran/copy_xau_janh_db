@@ -42,12 +42,12 @@ def sync_sheet_to_db(sheet_data):
 
         license = db.query(License).filter_by(account_number=account_number).first()
         if license:
-            license.license_key = row.get("license_key", "").strip()
+            license.license_key = str(row.get("license_key", "").strip())
             license.enabled = str(row.get("enabled", "False")).lower() == "true"
         else:
             new_license = License(
                 account_number=account_number,
-                license_key=row.get("license_key", "").strip(),
+                license_key=str(row.get("license_key", "").strip()),
                 enabled=str(row.get("enabled", "False")).lower() == "true"
             )
             db.add(new_license)

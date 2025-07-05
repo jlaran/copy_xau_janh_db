@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, Boolean, Float, DateTime
+from sqlalchemy import Column, String
 
 Base = declarative_base()
 
@@ -8,7 +8,7 @@ class License(Base):
 
     account_number = Column(String, primary_key=True)
     license_key = Column(String)
-    enabled = Column(Boolean)
+    enabled = Column(String)
 
 class AccountStatus(Base):
     __tablename__ = "account_status"

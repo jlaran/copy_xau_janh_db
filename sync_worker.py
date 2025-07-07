@@ -119,7 +119,7 @@ def run_sync():
             print("📥 Leyendo hoja de cálculo...")
             expected_headers = [
                 "account_number", "license_key", "enabled", "account_balance", "last_trade",
-                "account_mode", "broker_server", "broker_company", "risk_per_group", "ea_status"
+                "account_mode", "broker_server", "broker_company", "risk_per_group", "ea_status", "last_sync"
             ]
             sheet_data = sheet.get_all_records(expected_headers=expected_headers)
             sync_sheet_to_db(sheet_data)

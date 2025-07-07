@@ -133,7 +133,7 @@ def run_sync():
 
         print("⏳ Esperando 60 segundos para el próximo ciclo...\n")
         log("⏳ Esperando 60 segundos para el próximo ciclo...\n")
-        time.sleep(5)
+        time.sleep(60)
 
 def log(msg):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")

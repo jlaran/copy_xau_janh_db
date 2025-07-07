@@ -63,7 +63,8 @@ def sync_sheet_to_db(sheet_data):
                 broker_server=str(row.get("broker_server", "")).strip(),
                 broker_company=str(row.get("broker_company", "")).strip(),
                 risk_per_group=str(row.get("risk_per_group", "")).strip(),
-                ea_status=str(row.get("ea_status", "")).strip()
+                ea_status=str(row.get("ea_status", "")).strip(),
+                last_sync=str(row.get("last_sync", "")).strip()
             ))
 
     db.commit()
@@ -85,7 +86,7 @@ def sync_db_to_sheet(sheet_data):
 
         updatable_columns = [
             "account_balance", "last_trade", "account_mode",
-            "broker_server", "broker_company", "risk_per_group", "ea_status"
+            "broker_server", "broker_company", "risk_per_group", "ea_status", "last_sync"
         ]
 
         sheet_rows_by_account = {
